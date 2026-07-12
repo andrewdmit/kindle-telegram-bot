@@ -1,0 +1,24 @@
+[Unit]
+Description=Kindle Telegram Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=kindlebot
+Group=kindlebot
+WorkingDirectory=/opt/kindle-telegram-bot
+EnvironmentFile=/opt/kindle-telegram-bot/.env
+ExecStart=/opt/kindle-telegram-bot/.venv/bin/python /opt/kindle-telegram-bot/bot.py
+Restart=on-failure
+RestartSec=5
+
+# Безопасность
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/kindle-telegram-bot/data
+
+[Install]
+WantedBy=multi-user.target
