@@ -18,7 +18,7 @@ fi
 echo "==> Установка системных пакетов"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
-apt-get install -y -qq python3 python3-venv python3-pip git
+apt-get install -y -qq python3 python3-venv python3-pip rsync
 
 echo "==> Создание пользователя ${APP_USER}"
 if ! id "${APP_USER}" &>/dev/null; then
@@ -27,7 +27,9 @@ fi
 
 echo "==> Копирование файлов в ${APP_DIR}"
 mkdir -p "${APP_DIR}"
-rsync -a --exclude '.git' --exclude '.venv' --exclude 'data' --exclude '.env' \
+rsync -a --delete \
+  --exclude '.git' --exclude '.venv' --exclude 'data' --exclude '.env' \
+  --exclude '__pycache__' --exclude '.pytest_cache' \
   "${SCRIPT_DIR}/" "${APP_DIR}/"
 
 mkdir -p "${APP_DIR}/data"
@@ -54,6 +56,11 @@ echo "==> Установка systemd-сервиса"
 install -m 644 "${APP_DIR}/kindle-bot.service" "/etc/systemd/system/${SERVICE_NAME}"
 systemctl daemon-reload
 systemctl enable "${SERVICE_NAME}"
+
+if systemctl is-active --quiet "${SERVICE_NAME}"; then
+  echo "==> Перезапуск работающего сервиса"
+  systemctl restart "${SERVICE_NAME}"
+fi
 
 echo ""
 echo "Установка завершена."

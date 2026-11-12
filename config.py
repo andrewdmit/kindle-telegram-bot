@@ -39,6 +39,7 @@ class Settings:
     smtp_use_tls: bool
     database_path: Path
     max_file_size: int
+    widgets_enabled: bool = True
 
 
 def _require(name: str) -> str:
@@ -64,4 +65,5 @@ def load_settings() -> Settings:
         smtp_use_tls=os.getenv("SMTP_USE_TLS", "true").lower() in {"1", "true", "yes"},
         database_path=database_path,
         max_file_size=int(os.getenv("MAX_FILE_SIZE", str(20 * 1024 * 1024))),
+        widgets_enabled=os.getenv("WIDGETS_ENABLED", "true").lower() in {"1", "true", "yes"},
     )
