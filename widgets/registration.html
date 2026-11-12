@@ -1,0 +1,67 @@
+<style>
+body{margin:0;padding:10px 14px max(10px,env(safe-area-inset-bottom))}
+h3{margin:0 0 8px}
+.st{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--tg-theme-section-separator-color)}
+.st:first-of-type{border-top:0}
+.n{flex:none;width:22px;height:22px;border-radius:11px;text-align:center;line-height:22px;font-size:13px;font-weight:600;background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-hint-color)}
+.on .n{background:var(--tg-theme-button-color);color:var(--tg-theme-button-text-color)}
+.dn .n{background:#31b545;color:#fff}
+.b{flex:1;min-width:0}
+.t{font-weight:600}
+.h{color:var(--tg-theme-hint-color);font-size:13px}
+.v{font-family:ui-monospace,monospace;font-size:14px;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+button{font-size:13px;padding:6px 10px}
+.l{background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-link-color)}
+.er{color:var(--tg-theme-destructive-text-color);font-size:13px}
+.ok{color:#31b545;font-size:13px}
+.fin{margin-top:6px;padding:8px 10px;border-radius:10px;background:var(--tg-theme-secondary-bg-color)}
+</style>
+<h3>📚 Регистрация</h3>
+<div id="a"></div>
+<div class="h" id="m"></div>
+<script>
+const W = window.TelegramWidget, $ = (i) => document.getElementById(i);
+const AMZ = 'https://www.amazon.com/hz/mycd/digital-console/contentdevices/alldevices';
+const ERR = {NOT_ALLOWED: 'Откройте чат с ботом', BUSY: 'Подождите…', RATE_LIMITED: 'Слишком часто, подождите', TIMEOUT: 'Бот не ответил', FAILED: 'Нет связи с ботом'};
+let S = {}, busy = 0;
+function load(t) {
+  try { const n = JSON.parse(t); if (n && (S.r === undefined || n.r >= S.r)) S = n; } catch (e) {}
+}
+function esc(s) { return String(s || '').replace(/[&<>"]/g, (c) => '&#' + c.charCodeAt(0) + ';'); }
+function btn(txt, cls, fn) { const b = document.createElement('button'); b.textContent = txt; if (cls) b.className = cls; b.onclick = fn; b.disabled = !!busy && fn.q; return b; }
+function step(n, cls, title, html, btns) {
+  const d = document.createElement('div');
+  d.className = 'st ' + cls;
+  d.innerHTML = '<div class="n">' + (cls === 'dn' ? '✓' : n) + '</div><div class="b"><div class="t">' + title + '</div>' + html + '</div>';
+  if (btns.length) { const r = document.createElement('div'); r.className = 'row'; r.append(...btns); d.lastChild.append(r); }
+  return d;
+}
+function ask(data) {
+  if (!W) return;
+  busy = 1; $('m').textContent = 'Отправляю…'; draw();
+  W.request(data).then((a) => { busy = 0; $('m').textContent = ''; load(a.result); draw(); },
+    (e) => { busy = 0; $('m').textContent = ERR[e.code] || 'Ошибка: ' + e.code; draw(); });
+}
+function q(data) { const f = () => ask(data); f.q = 1; return f; }
+function draw() {
+  const s = S.s || 1, a = $('a'), st = [];
+  st.push(s > 1 && S.e
+    ? step(1, 'dn', 'Kindle email', '<div class="v">' + esc(S.e) + '</div>', [btn('Изменить', 'l', q('reg:edit'))])
+    : step(1, 'on', 'Kindle email', '<div class="h">Отправьте адрес ответным сообщением, например <b>name@kindle.com</b></div>',
+      [btn('Где его найти?', 'l', () => W && W.openLink(AMZ))]));
+  st.push(step(2, s > 2 ? 'dn' : s === 2 ? 'on' : '', 'Разрешите отправителя',
+    '<div class="h">Amazon → Preferences → Personal Document Settings → Approved E-mail List</div><div class="v">' + esc(S.f) + '</div>',
+    s === 2 ? [btn('Скопировать', 'l', () => W && W.copyText(S.f)), btn('Amazon', 'l', () => W && W.openLink(AMZ)), btn('Я добавил', '', q('reg:ok'))] : []));
+  const t = S.t === 'run' ? '<div class="h">Отправляю тестовый документ…</div>'
+    : S.t === 'ok' ? '<div class="ok">Тест отправлен — проверьте Kindle через пару минут</div>'
+    : S.t === 'err' ? '<div class="er">' + esc(S.te || 'Не удалось отправить') + '</div>' : '<div class="h">Необязательно</div>';
+  st.push(step(3, S.t === 'ok' ? 'dn' : s === 3 ? 'on' : '', 'Проверка', t,
+    s === 3 && S.t !== 'run' ? [btn(S.t ? 'Ещё раз' : 'Отправить тест', 'l', q('reg:test'))] : []));
+  a.replaceChildren(...st);
+  if (s === 3) { const f = document.createElement('div'); f.className = 'fin'; f.textContent = '✅ Готово! Присылайте книги файлами в этот чат.'; a.append(f); }
+}
+if (W) { load(W.chatData); W.onEvent('chatDataChanged', () => { load(W.chatData); draw(); }); }
+draw();
+if (W) W.ready();
+</script>

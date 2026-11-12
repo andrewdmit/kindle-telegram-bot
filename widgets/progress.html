@@ -1,0 +1,83 @@
+<style>
+body{margin:0;padding:10px 14px max(10px,env(safe-area-inset-bottom))}
+h3{margin:0 0 2px}
+.h{color:var(--tg-theme-hint-color);font-size:13px}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.tm{font-variant-numeric:tabular-nums}
+.bar{height:6px;margin:8px 0 4px;border-radius:3px;background:var(--tg-theme-secondary-bg-color);overflow:hidden}
+.fill{height:100%;width:0;border-radius:3px;background:var(--tg-theme-button-color);transition:width .4s ease}
+.done .fill{background:#31b545}
+.it{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--tg-theme-section-separator-color)}
+.ic{flex:none;width:22px;height:22px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-hint-color)}
+.s4 .ic{background:#31b545;color:#fff}
+.s5 .ic{background:var(--tg-theme-destructive-text-color);color:#fff}
+.run .ic{border:2px solid var(--tg-theme-secondary-bg-color);border-top-color:var(--tg-theme-button-color);background:none;width:18px;height:18px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.run .ic{animation:none}}
+.b{flex:1;min-width:0}
+.nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.er{color:var(--tg-theme-destructive-text-color);font-size:13px;overflow-wrap:anywhere}
+.ph{display:flex;gap:3px;margin-top:4px}
+.ph i{flex:1;height:3px;border-radius:2px;background:var(--tg-theme-secondary-bg-color)}
+.ph i.y{background:var(--tg-theme-button-color)}
+.end{margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--tg-theme-secondary-bg-color);font-size:14px}
+button{width:100%;margin-top:8px}
+</style>
+<div class="top"><h3>🚀 Отправка на Kindle</h3><span class="h tm" id="tm"></span></div>
+<div class="h" id="sub"></div>
+<div id="bx"><div class="bar"><div class="fill" id="fl"></div></div></div>
+<div id="list"></div>
+<div id="end"></div>
+<div class="h" id="m"></div>
+<script>
+const W = window.TelegramWidget, $ = (i) => document.getElementById(i);
+const ERR = {NOT_ALLOWED: 'Откройте чат с ботом', BUSY: 'Подождите…', RATE_LIMITED: 'Слишком часто, подождите', TIMEOUT: 'Бот не ответил', FAILED: 'Нет связи с ботом'};
+const PH = ['В очереди', 'Скачиваю из Telegram', 'Готовлю письмо', 'Отправляю на почту Amazon', 'Отправлено', 'Ошибка'];
+let S = {f: []}, busy = 0;
+function load(t) { try { const n = JSON.parse(t); if (n && (S.r === undefined || n.r >= S.r)) S = n; } catch (e) {} }
+function el(t, c, txt) { const e = document.createElement(t); if (c) e.className = c; if (txt !== undefined) e.textContent = txt; return e; }
+function mmss(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+function tick() {
+  if (!S.t0) return;
+  $('tm').textContent = mmss((S.t1 || Date.now() / 1000) - S.t0);
+}
+function draw() {
+  const f = S.f || [], n = f.length + (S.x || 0), fin = !!S.t1;
+  const ok = f.filter((i) => i[1] === 4).length + (S.xo || 0), bad = f.filter((i) => i[1] === 5).length + (S.xe || 0);
+  const pts = f.reduce((a, i) => a + Math.min(i[1], 4), 0) + (S.xo || 0) * 4 + (S.xe || 0) * 4;
+  $('sub').textContent = (S.to ? 'На ' + S.to + ' · ' : '') + ok + ' из ' + n + ' готово';
+  $('fl').style.width = (n ? Math.round((fin ? ok * 4 : pts) / (n * 4) * 100) : 0) + '%';
+  $('bx').className = fin ? 'done' : '';
+  $('list').replaceChildren(...f.map((i) => {
+    const s = i[1], run = s > 0 && s < 4, r = el('div', 'it s' + s + (run ? ' run' : '')), b = el('div', 'b');
+    r.append(el('div', 'ic', run ? '' : s === 4 ? '✓' : s === 5 ? '!' : '•'));
+    b.append(el('div', 'nm', i[0]));
+    if (s === 5) b.append(el('div', 'er', i[2] || PH[5]));
+    else {
+      b.append(el('div', 'h', PH[s]));
+      if (run) { const p = el('div', 'ph'); for (let k = 1; k < 4; k++) p.append(el('i', k <= s ? 'y' : '')); b.append(p); }
+    }
+    r.append(b); return r;
+  }));
+  if (S.x) $('list').append(el('div', 'h', '…и ещё ' + S.x));
+  const e = $('end'); e.replaceChildren();
+  if (fin) {
+    e.append(el('div', 'end', bad ? '⚠️ Не отправлено: ' + bad + '. Проверьте формат и настройки Amazon.' : '✅ Готово! Книги появятся в библиотеке Kindle через несколько минут.'));
+    if (bad) {
+      const b = el('button', '', 'Повторить неудачные'); b.disabled = !!busy;
+      b.onclick = () => {
+        if (!W) return;
+        busy = 1; $('m').textContent = 'Отправляю…'; draw();
+        W.request('pr:retry:' + S.id).then((a) => { busy = 0; $('m').textContent = ''; load(a.result); draw(); },
+          (er) => { busy = 0; $('m').textContent = ERR[er.code] || 'Ошибка: ' + er.code; draw(); });
+      };
+      e.append(b);
+    }
+  }
+  tick();
+}
+if (W) { load(W.chatData); W.onEvent('chatDataChanged', () => { load(W.chatData); draw(); }); }
+draw();
+setInterval(tick, 1000);
+if (W) W.ready();
+</script>

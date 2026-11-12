@@ -1,0 +1,77 @@
+<style>
+body{margin:0;padding:10px 14px max(10px,env(safe-area-inset-bottom))}
+h3{margin:0 0 2px}
+.h{color:var(--tg-theme-hint-color);font-size:13px}
+.f{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--tg-theme-section-separator-color)}
+.f:first-child{border-top:0}
+.i{flex:none;width:34px;height:40px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;text-transform:uppercase;background:var(--tg-theme-button-color);color:var(--tg-theme-button-text-color)}
+.bad .i{background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-destructive-text-color)}
+.b{flex:1;min-width:0}
+.nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bad .nm{color:var(--tg-theme-hint-color)}
+.er{color:var(--tg-theme-destructive-text-color);font-size:13px}
+.x{flex:none;width:30px;height:30px;padding:0;border-radius:15px;background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-hint-color)}
+.l{margin:8px 0}
+.row{display:flex;gap:6px;margin-top:8px}
+.row button{flex:1}
+.sec{background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-link-color)}
+.tg{display:flex;align-items:center;gap:8px;margin-top:8px;padding:0;background:none;color:var(--tg-theme-text-color);font-size:14px;text-align:left}
+.sw{flex:none;width:34px;height:20px;border-radius:10px;background:var(--tg-theme-secondary-bg-color);position:relative;transition:background .2s}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:8px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .2s}
+.on .sw{background:var(--tg-theme-button-color)}
+.on .sw::after{transform:translateX(14px)}
+.end{margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--tg-theme-secondary-bg-color);font-size:14px}
+</style>
+<h3>📥 Приём книг</h3>
+<div class="h" id="sub"></div>
+<div class="l" id="list"></div>
+<div id="ctl"></div>
+<div class="h" id="m"></div>
+<script>
+const W = window.TelegramWidget, $ = (i) => document.getElementById(i);
+const ERR = {NOT_ALLOWED: 'Откройте чат с ботом', BUSY: 'Подождите…', RATE_LIMITED: 'Слишком часто, подождите', TIMEOUT: 'Бот не ответил', FAILED: 'Нет связи с ботом'};
+const WHY = {fmt: 'Формат не поддерживается', big: 'Больше лимита', gone: 'Файл недоступен'};
+let S = {f: []}, busy = 0;
+function load(t) { try { const n = JSON.parse(t); if (n && (S.r === undefined || n.r >= S.r)) S = n; } catch (e) {} }
+function sz(b) { return b >= 1048576 ? (b / 1048576).toFixed(1) + ' МБ' : Math.max(1, Math.round(b / 1024)) + ' КБ'; }
+function el(t, c, txt) { const e = document.createElement(t); if (c) e.className = c; if (txt !== undefined) e.textContent = txt; return e; }
+function ask(data) {
+  if (!W) return;
+  busy = 1; $('m').textContent = 'Отправляю…'; draw();
+  W.request(data).then((a) => { busy = 0; $('m').textContent = ''; load(a.result); draw(); },
+    (e) => { busy = 0; $('m').textContent = ERR[e.code] || 'Ошибка: ' + e.code; draw(); });
+}
+function draw() {
+  const open = S.st === 'open', files = S.f || [], ok = files.filter((f) => !f[4]);
+  const hasPdf = ok.some((f) => f[3] === 'pdf');
+  $('sub').textContent = S.to ? 'На ' + S.to : '';
+  $('list').replaceChildren(...files.map((f) => {
+    const row = el('div', 'f' + (f[4] ? ' bad' : '')), b = el('div', 'b');
+    row.append(el('div', 'i', f[3] || '?'));
+    b.append(el('div', 'nm', f[1]), f[4] ? el('div', 'er', WHY[f[4]] || f[4]) : el('div', 'h', sz(f[2])));
+    row.append(b);
+    if (open) { const x = el('button', 'x', '✕'); x.disabled = !!busy; x.onclick = () => ask('in:rm:' + S.id + ':' + f[0]); row.append(x); }
+    return row;
+  }));
+  if (S.x) $('list').append(el('div', 'h', '…и ещё ' + S.x));
+  const c = $('ctl'); c.replaceChildren();
+  if (open && ok.length) {
+    if (hasPdf) {
+      const t = el('button', 'tg' + (S.cv ? ' on' : '')); t.disabled = !!busy;
+      t.append(el('span', 'sw'), el('span', '', 'Конвертировать PDF в формат Kindle'));
+      t.onclick = () => ask('in:cv:' + S.id); c.append(t);
+    }
+    const r = el('div', 'row'), send = el('button', '', 'Отправить (' + ok.length + ')'), clr = el('button', 'sec', 'Очистить');
+    send.disabled = clr.disabled = !!busy;
+    send.onclick = () => ask('in:send:' + S.id); clr.onclick = () => ask('in:clr:' + S.id);
+    r.append(send, clr); c.append(r);
+  } else if (open) {
+    c.append(el('div', 'end', files.length ? 'Нечего отправлять. Пришлите книгу другого формата.' : 'Пришлите файл книги — он появится здесь.'));
+  } else {
+    c.append(el('div', 'end', S.st === 'sent' ? '🚀 Отправка запущена — прогресс ниже.' : S.st === 'moved' ? 'Файлы перенесены в новый список ниже.' : 'Список очищен.'));
+  }
+}
+if (W) { load(W.chatData); W.onEvent('chatDataChanged', () => { load(W.chatData); draw(); }); }
+draw();
+if (W) W.ready();
+</script>
