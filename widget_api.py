@@ -29,7 +29,12 @@ WIDGET_UPDATE_TYPES = ["widget_query", "shared_widget_query"]
 
 
 def load_widget_html(name: str) -> str:
-    return (WIDGETS_DIR / f"{name}.html").read_text(encoding="utf-8").strip()
+    """Читает виджет и убирает отступы строк: лимит считается после zlib, каждый байт на счету.
+
+    Переносы строк сохраняются, поэтому JS и CSS не меняют смысла.
+    """
+    text = (WIDGETS_DIR / f"{name}.html").read_text(encoding="utf-8")
+    return "\n".join(line.strip() for line in text.splitlines() if line.strip())
 
 
 def dump_state(state: dict[str, Any]) -> str:

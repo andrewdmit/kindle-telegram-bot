@@ -165,8 +165,18 @@ def test_widget_html_fits_limits(name):
     assert len(html) <= 32768
     assert len(zlib.compress(html, 9)) <= MAX_HTML_COMPRESSED
     assert b"\x00" not in html
-    for banned in (b"<input", b"<select", b"<textarea", b"fetch(", b"<progress", b"vh;"):
-        assert banned not in html
+    # всё это вне профиля виджетов: клиент молча вырежет, и дизайн развалится
+    banned = (
+        "<input", "<select", "<textarea", "<progress", "fetch(", "vh;", "vh)",
+        "color-mix", "oklch", ":has(", "text-shadow", "clip-path", "mask:",
+        "@font-face", "position:sticky", "overflow:auto", "overflow:scroll",
+        "font-family:'", 'font-family:"', "<animate",
+    )
+    text = html.decode("utf-8")
+    for token in banned:
+        assert token not in text, token
+    # opacity < 1 и размытые тени — «тяжёлые» элементы, их не больше 16: не используем вовсе
+    assert "opacity:" not in text.replace("opacity:1", "")
 
 
 def test_widget_query_is_parsed_from_api_kwargs():

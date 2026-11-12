@@ -1,37 +1,66 @@
 <style>
-body{margin:0;padding:10px 14px max(10px,env(safe-area-inset-bottom))}
-h3{margin:0 0 2px}
-.h{color:var(--tg-theme-hint-color);font-size:13px}
-.f{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--tg-theme-section-separator-color)}
-.f:first-child{border-top:0}
-.i{flex:none;width:34px;height:40px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;text-transform:uppercase;background:var(--tg-theme-button-color);color:var(--tg-theme-button-text-color)}
+body{margin:0;padding:0 0 max(12px,env(safe-area-inset-bottom));--a:var(--tg-theme-button-color);--b:var(--tg-theme-accent-text-color)}
+.hd{display:flex;align-items:center;gap:12px;padding:14px;color:#fff;background:linear-gradient(120deg,var(--a),var(--b),var(--a));background-size:220% 100%;animation:fl 8s ease-in-out infinite alternate}
+@keyframes fl{to{background-position:100% 0}}
+.ic{flex:none;width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(255,255,255,.22)}
+.ht{flex:1;min-width:0}
+.ht b{display:block;font-size:17px}
+.ht small{display:block;color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ct{flex:none;min-width:44px;height:44px;padding:0 6px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;background:rgba(255,255,255,.22)}
+.pop{animation:pp .5s cubic-bezier(.3,1.8,.5,1)}
+@keyframes pp{40%{transform:scale(1.35)}}
+.ls{padding:8px 14px 0}
+.f{display:flex;align-items:center;gap:10px;margin-top:6px;padding:8px;border-radius:14px;background:var(--tg-theme-secondary-bg-color)}
+.in{animation:sl .45s cubic-bezier(.2,.9,.3,1.15) both}
+@keyframes sl{from{transform:translateX(40px)}}
+.i{flex:none;width:36px;height:44px;border-radius:8px 14px 8px 8px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;font-size:9px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#fff;background:linear-gradient(160deg,rgba(255,255,255,.35),transparent 60%),var(--c)}
+.bad{background:none;border:1.5px dashed var(--tg-theme-section-separator-color)}
 .bad .i{background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-destructive-text-color)}
 .b{flex:1;min-width:0}
-.nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
 .bad .nm{color:var(--tg-theme-hint-color)}
+.h{color:var(--tg-theme-hint-color);font-size:13px}
 .er{color:var(--tg-theme-destructive-text-color);font-size:13px}
-.x{flex:none;width:30px;height:30px;padding:0;border-radius:15px;background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-hint-color)}
-.l{margin:8px 0}
-.row{display:flex;gap:6px;margin-top:8px}
-.row button{flex:1}
-.sec{background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-link-color)}
-.tg{display:flex;align-items:center;gap:8px;margin-top:8px;padding:0;background:none;color:var(--tg-theme-text-color);font-size:14px;text-align:left}
-.sw{flex:none;width:34px;height:20px;border-radius:10px;background:var(--tg-theme-secondary-bg-color);position:relative;transition:background .2s}
-.sw::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:8px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .2s}
-.on .sw{background:var(--tg-theme-button-color)}
-.on .sw::after{transform:translateX(14px)}
-.end{margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--tg-theme-secondary-bg-color);font-size:14px}
+.pg{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:6px}
+.pg button{width:32px;height:28px;padding:0;background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-link-color)}
+.x{flex:none;width:30px;height:30px;padding:0;border-radius:15px;background:var(--tg-theme-bg-color);color:var(--tg-theme-hint-color)}
+.tg{display:flex;align-items:center;gap:10px;width:100%;margin-top:10px;padding:0;background:none;color:var(--tg-theme-text-color);font-size:14px;text-align:left}
+.sw{flex:none;width:38px;height:22px;border-radius:11px;background:var(--tg-theme-section-separator-color);position:relative;transition:background .25s}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:9px;background:#fff;transition:transform .3s cubic-bezier(.3,1.5,.5,1)}
+.on .sw{background:#2fb563}
+.on .sw::after{transform:translateX(16px)}
+.row{display:flex;gap:8px;margin-top:12px}
+button{border-radius:12px;transition:transform .15s}
+button:active{transform:scale(.96)}
+.go{flex:1;position:relative;overflow:hidden;padding:11px;font-weight:700;color:#fff;background:linear-gradient(120deg,var(--a),var(--b))}
+.go::after{content:'';position:absolute;top:0;bottom:0;left:-40%;width:30%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg);animation:sh 2.6s ease-in-out infinite}
+@keyframes sh{60%,to{left:120%}}
+.go i{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:9px;font-style:normal;font-size:12px;background:rgba(255,255,255,.25)}
+.sec{padding:11px 14px;background:var(--tg-theme-secondary-bg-color);color:var(--tg-theme-link-color)}
+.end{display:flex;align-items:center;gap:10px;margin-top:10px;padding:12px;border-radius:14px;background:var(--tg-theme-secondary-bg-color);font-size:14px}
+.end b{font-size:22px}
+.fly b{animation:fy 1.6s ease-in-out infinite}
+@keyframes fy{50%{transform:translate(3px,-4px) rotate(-6deg)}}
+#m{padding:6px 14px 0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-<h3>📥 Приём книг</h3>
-<div class="h" id="sub"></div>
-<div class="l" id="list"></div>
-<div id="ctl"></div>
+<div class="hd"><div class="ic">📥</div><div class="ht"><b>Приём книг</b><small id="sub"></small></div><div class="ct" id="ct">0</div></div>
+<div class="ls"><div id="list"></div><div class="h" id="tot"></div><div id="ctl"></div></div>
 <div class="h" id="m"></div>
 <script>
 const W = window.TelegramWidget, $ = (i) => document.getElementById(i);
 const ERR = {NOT_ALLOWED: 'Откройте чат с ботом', BUSY: 'Подождите…', RATE_LIMITED: 'Слишком часто, подождите', TIMEOUT: 'Бот не ответил', FAILED: 'Нет связи с ботом'};
 const WHY = {fmt: 'Формат не поддерживается', big: 'Больше лимита', gone: 'Файл недоступен'};
-let S = {f: []}, busy = 0;
+const COL = {epub: '#2fb563', pdf: '#e5484d', mobi: '#f59f0a', azw: '#f59f0a', azw3: '#f59f0a', prc: '#f59f0a', doc: '#3b82f6', docx: '#3b82f6', rtf: '#3b82f6', txt: '#8e8e93', zip: '#8b5cf6'};
+let S = {f: []}, busy = 0, seen = null, cnt = 0, pg = 0;
+const PER = 4;
+function tone() {
+  const c = W && W.themeParams.button_color;
+  if (!c) return;
+  let [r, g, b] = [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16) / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, h = 0, s = 0, e = mx - mn;
+  if (e) { s = l > .5 ? e / (2 - mx - mn) : e / (mx + mn); h = 60 * (mx === r ? (g - b) / e + (g < b ? 6 : 0) : mx === g ? (b - r) / e + 2 : (r - g) / e + 4); }
+  document.body.style.setProperty('--b', 'hsl(' + ((h + 40) % 360) + ',' + Math.round(s * 100) + '%,' + Math.round(l * 85) + '%)');
+}
 function load(t) { try { const n = JSON.parse(t); if (n && (S.r === undefined || n.r >= S.r)) S = n; } catch (e) {} }
 function sz(b) { return b >= 1048576 ? (b / 1048576).toFixed(1) + ' МБ' : Math.max(1, Math.round(b / 1024)) + ' КБ'; }
 function el(t, c, txt) { const e = document.createElement(t); if (c) e.className = c; if (txt !== undefined) e.textContent = txt; return e; }
@@ -43,35 +72,50 @@ function ask(data) {
 }
 function draw() {
   const open = S.st === 'open', files = S.f || [], ok = files.filter((f) => !f[4]);
-  const hasPdf = ok.some((f) => f[3] === 'pdf');
-  $('sub').textContent = S.to ? 'На ' + S.to : '';
-  $('list').replaceChildren(...files.map((f) => {
-    const row = el('div', 'f' + (f[4] ? ' bad' : '')), b = el('div', 'b');
-    row.append(el('div', 'i', f[3] || '?'));
+  const was = seen; seen = new Set(files.map((f) => f[0]));
+  $('sub').textContent = S.to ? '→ ' + S.to : '';
+  const ct = $('ct'), n = ok.length + (S.x || 0);
+  ct.textContent = n;
+  if (n > cnt && was) { ct.classList.remove('pop'); ct.offsetWidth; ct.classList.add('pop'); }
+  cnt = n;
+  const pages = Math.ceil(files.length / PER) || 1;
+  if (was && files.some((f) => !was.has(f[0]))) pg = pages - 1;
+  pg = Math.min(pg, pages - 1);
+  $('list').replaceChildren(...files.slice(pg * PER, pg * PER + PER).map((f) => {
+    const row = el('div', 'f' + (f[4] ? ' bad' : '') + (was && !was.has(f[0]) ? ' in' : '')), b = el('div', 'b'), ic = el('div', 'i', f[3] || '?');
+    ic.style.setProperty('--c', COL[f[3]] || 'var(--a)');
     b.append(el('div', 'nm', f[1]), f[4] ? el('div', 'er', WHY[f[4]] || f[4]) : el('div', 'h', sz(f[2])));
-    row.append(b);
+    row.append(ic, b);
     if (open) { const x = el('button', 'x', '✕'); x.disabled = !!busy; x.onclick = () => ask('in:rm:' + S.id + ':' + f[0]); row.append(x); }
     return row;
   }));
-  if (S.x) $('list').append(el('div', 'h', '…и ещё ' + S.x));
+  if (pages > 1) {
+    const p = el('div', 'pg'), l = el('button', '', '‹'), r = el('button', '', '›');
+    l.disabled = !pg; r.disabled = pg === pages - 1;
+    l.onclick = () => { pg--; draw(); }; r.onclick = () => { pg++; draw(); };
+    p.append(l, el('span', 'h', pg + 1 + ' / ' + pages), r); $('list').append(p);
+  }
+  const total = ok.reduce((a, f) => a + f[2], 0);
+  $('tot').textContent = (S.x ? '…и ещё ' + S.x + ' · ' : '') + (ok.length ? 'Всего ' + sz(total) : '');
   const c = $('ctl'); c.replaceChildren();
   if (open && ok.length) {
-    if (hasPdf) {
+    if (ok.some((f) => f[3] === 'pdf')) {
       const t = el('button', 'tg' + (S.cv ? ' on' : '')); t.disabled = !!busy;
       t.append(el('span', 'sw'), el('span', '', 'Конвертировать PDF в формат Kindle'));
       t.onclick = () => ask('in:cv:' + S.id); c.append(t);
     }
-    const r = el('div', 'row'), send = el('button', '', 'Отправить (' + ok.length + ')'), clr = el('button', 'sec', 'Очистить');
-    send.disabled = clr.disabled = !!busy;
-    send.onclick = () => ask('in:send:' + S.id); clr.onclick = () => ask('in:clr:' + S.id);
-    r.append(send, clr); c.append(r);
-  } else if (open) {
-    c.append(el('div', 'end', files.length ? 'Нечего отправлять. Пришлите книгу другого формата.' : 'Пришлите файл книги — он появится здесь.'));
+    const r = el('div', 'row'), go = el('button', 'go', 'Отправить на Kindle'), clr = el('button', 'sec', 'Очистить');
+    go.append(el('i', '', n));
+    go.disabled = clr.disabled = !!busy;
+    go.onclick = () => ask('in:send:' + S.id); clr.onclick = () => ask('in:clr:' + S.id);
+    r.append(go, clr); c.append(r);
   } else {
-    c.append(el('div', 'end', S.st === 'sent' ? '🚀 Отправка запущена — прогресс ниже.' : S.st === 'moved' ? 'Файлы перенесены в новый список ниже.' : 'Список очищен.'));
+    const [ico, txt] = !open ? (S.st === 'sent' ? ['🚀', 'Отправка запущена — прогресс ниже'] : S.st === 'moved' ? ['⤵️', 'Файлы перенесены в новый список ниже'] : ['🧹', 'Список очищен'])
+      : files.length ? ['🤔', 'Нечего отправлять. Пришлите книгу другого формата'] : ['📎', 'Пришлите файл книги — он появится здесь'];
+    const e = el('div', 'end' + (S.st === 'sent' ? ' fly' : '')); e.append(el('b', '', ico), el('span', '', txt)); c.append(e);
   }
 }
-if (W) { load(W.chatData); W.onEvent('chatDataChanged', () => { load(W.chatData); draw(); }); }
+if (W) { load(W.chatData); tone(); W.onEvent('chatDataChanged', () => { load(W.chatData); draw(); }); W.onEvent('themeChanged', tone); }
 draw();
 if (W) W.ready();
 </script>
